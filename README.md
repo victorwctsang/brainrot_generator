@@ -1,0 +1,67 @@
+# PDF to AI Summary in Brainrot Style
+
+This app takes a PDF file as input and sends it to OpenAI's API, generating a summary in the "brainrot" style—a unique and entertaining way of digesting information. The output is designed to transform complex or dry content into an informal, amusing, and ultra-condensed summary that still conveys the essential ideas.
+
+## Features
+
+- **PDF Upload**: Accepts PDF files and extracts the text for processing.
+- **OpenAI API Integration**: Sends extracted text to OpenAI’s API to generate a summary.
+- **Brainrot Style Output**: Utilizes custom prompt engineering to produce "brainrot"-style summaries—quirky, lighthearted, and engaging.
+- **Downloadable Summary**: The AI-generated summary can be downloaded or shared.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.x
+- [OpenAI API Key](https://platform.openai.com/signup/)
+- Required libraries: `PyPDF2` (for PDF extraction), `openai` (for API access), and `requests`
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/username/pdf-brainrot-summary.git
+   cd pdf-brainrot-summary
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Set up your OpenAI API key as an environment variable:
+   ```bash
+   export OPENAI_API_KEY='your_api_key_here'
+   ```
+
+### Usage
+
+1. Run the app:
+   ```bash
+   python app.py
+   ```
+
+2. Upload a PDF file.
+
+3. Wait as the app extracts text and sends it to OpenAI.
+
+4. Enjoy your brainrot-style summary!
+
+## Example
+
+Original PDF content: *"A comprehensive analysis of macroeconomic factors affecting GDP..."*
+
+Brainrot-style summary: *"Basically, it’s like this: the economy goes up, it goes down. GDP loves that. Repeat cycle."*
+
+## Contributing
+
+Contributions are welcome! If you have ideas for improving the app or making the summaries even more "brainrot," feel free to submit a pull request.
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+Let me know if you'd like any adjustments!
