@@ -4,12 +4,14 @@ This app takes content as input and sends it to OpenAI's API, generating a summa
 
 ## Features
 
-- [ ] **Free text input**: Accepts text input.
-- [ ] **PDF Upload**: Accepts PDF files and extracts the text for processing.
-- [ ] **OpenAI API Integration**: Sends extracted text to OpenAI’s API to generate a summary.
-- [ ] **Brainrot Style Output**: Utilizes custom prompt engineering to produce "brainrot"-style summaries—quirky, lighthearted, and engaging.
-- [ ] **Plain Text Output**: Returns output in text form.
-- [ ] **Video Output**: The text output will be overlaid on a subway surfers video with AI text to speech.
+- [x] **Free text input**: Accepts text input.
+- [x] **PDF Upload**: Accepts PDF files and extracts the text for processing.
+- [x] **OpenAI API Integration**: Sends extracted text to OpenAI’s API to generate a summary.
+- [x] **Brainrot Style Output**: Utilizes custom prompt engineering to produce "brainrot"-style summaries—quirky, lighthearted, and engaging.
+- [x] **Plain Text Output**: Returns output in text form.
+- [x] **Video Output**: The text output will be overlaid on a subway surfers video with AI text to speech.
+- [ ] **Fine Tuned Model**: A specific model trained on brainrot responses.
+- [ ] **Subtitled Video**: Subtitles to go with the brainrot TTS video.
 
 ## Getting Started
 
