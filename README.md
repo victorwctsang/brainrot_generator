@@ -25,8 +25,8 @@ This app takes content as input and sends it to OpenAI's API, generating a summa
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/pdf-brainrot-summary.git
-   cd pdf-brainrot-summary
+   git clone https://github.com/victorwctsang/brainrot_generator.git
+   cd brainrot_generator
    ```
 
 2. Install dependencies:
