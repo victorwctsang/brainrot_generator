@@ -1,2 +1,7 @@
 .venv
 .env
+*.mp3
+*.mp4
+*.pdf
+scrapbook.ipynb
+.DS_Store
