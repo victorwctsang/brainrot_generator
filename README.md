@@ -1,13 +1,15 @@
-# PDF to AI Summary in Brainrot Style
+# Text to Brainrot
 
-This app takes a PDF file as input and sends it to OpenAI's API, generating a summary in the "brainrot" style—a unique and entertaining way of digesting information. The output is designed to transform complex or dry content into an informal, amusing, and ultra-condensed summary that still conveys the essential ideas.
+This app takes content as input and sends it to OpenAI's API, generating a summary in the "brainrot" style. Why? Because my brain is fried, and complex/dry content is more easily understood when it has subway surfers footage + meme style delivery.
 
 ## Features
 
-- **PDF Upload**: Accepts PDF files and extracts the text for processing.
-- **OpenAI API Integration**: Sends extracted text to OpenAI’s API to generate a summary.
-- **Brainrot Style Output**: Utilizes custom prompt engineering to produce "brainrot"-style summaries—quirky, lighthearted, and engaging.
-- **Downloadable Summary**: The AI-generated summary can be downloaded or shared.
+- [ ] **Free text input**: Accepts text input.
+- [ ] **PDF Upload**: Accepts PDF files and extracts the text for processing.
+- [ ] **OpenAI API Integration**: Sends extracted text to OpenAI’s API to generate a summary.
+- [ ] **Brainrot Style Output**: Utilizes custom prompt engineering to produce "brainrot"-style summaries—quirky, lighthearted, and engaging.
+- [ ] **Plain Text Output**: Returns output in text form.
+- [ ] **Video Output**: The text output will be overlaid on a subway surfers video with AI text to speech.
 
 ## Getting Started
 
@@ -61,7 +63,3 @@ Contributions are welcome! If you have ideas for improving the app or making the
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-Let me know if you'd like any adjustments!
