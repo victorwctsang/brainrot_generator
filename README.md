@@ -48,15 +48,13 @@ This app takes content as input and sends it to OpenAI's API, generating a summa
 
 2. Upload a PDF file.
 
-3. Wait as the app extracts text and sends it to OpenAI.
+3. Wait as the app extracts text, sends it to OpenAI, and generates the text to speech audio for the subway surfers clip.
 
 4. Enjoy your brainrot-style summary!
 
 ## Example
 
-Original PDF content: *"A comprehensive analysis of macroeconomic factors affecting GDP..."*
-
-Brainrot-style summary: *"Basically, it’s like this: the economy goes up, it goes down. GDP loves that. Repeat cycle."*
+[Example Video](https://www.canva.com/design/DAGVnKSRMYs/bPv5Fn0w0kUpj66XiqFuIA/watch?utm_content=DAGVnKSRMYs&utm_campaign=designshare&utm_medium=link&utm_source=editor)
 
 ## Contributing
 
