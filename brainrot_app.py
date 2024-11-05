@@ -159,7 +159,7 @@ if st.button("Brainrotize"):
 
                 status_message = "I went to video generation island and everyone knew you..."
                 st.info(icon='💬', body=status_message)
-                status.update(label=status_message, state="running", expanded=False)
+                status.update(label=status_message, state="running", expanded=True)
                 brainrot_video_filepath = combineVideoAndAudio(audio_file=brainrot_tts_filepath)
 
                 status.update(label="W brainrot 🗿", state="complete", expanded=False)
@@ -169,6 +169,7 @@ if st.button("Brainrotize"):
             side = max((100 - width) / 2, 0.01)
             _, container, _ = st.columns([side, width, side])
             container.video(data=brainrot_video_filepath, format='video/mp4', autoplay=True)
+            st.write(brainrot)
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
