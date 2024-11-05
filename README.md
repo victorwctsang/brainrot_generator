@@ -2,6 +2,10 @@
 
 This app takes content as input and sends it to OpenAI's API, generating a summary in the "brainrot" style. Why? Because my brain is fried, and complex/dry content is more easily understood when it has subway surfers footage + meme style delivery.
 
+## Example
+
+[Example Video](https://www.canva.com/design/DAGVnKSRMYs/bPv5Fn0w0kUpj66XiqFuIA/watch?utm_content=DAGVnKSRMYs&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+
 ## Features
 
 - [x] **Free text input**: Accepts text input.
@@ -51,15 +55,3 @@ This app takes content as input and sends it to OpenAI's API, generating a summa
 3. Wait as the app extracts text, sends it to OpenAI, and generates the text to speech audio for the subway surfers clip.
 
 4. Enjoy your brainrot-style summary!
-
-## Example
-
-[Example Video](https://www.canva.com/design/DAGVnKSRMYs/bPv5Fn0w0kUpj66XiqFuIA/watch?utm_content=DAGVnKSRMYs&utm_campaign=designshare&utm_medium=link&utm_source=editor)
-
-## Contributing
-
-Contributions are welcome! If you have ideas for improving the app or making the summaries even more "brainrot," feel free to submit a pull request.
-
-## License
-
-This project is licensed under the MIT License.
