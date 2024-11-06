@@ -15,8 +15,8 @@ load_dotenv(override=True)
 ########################################################################################################################
 
 # System prompt for brainrot explainer
-SYSTEM_PROMPT = os.getenv('SYSTEM_PROMPT')
-DEFAULT_WIDTH = int(os.getenv('DEFAULT_WIDTH'))
+SYSTEM_PROMPT = os.getenv('SYSTEM_PROMPT', '')
+DEFAULT_WIDTH = int(os.getenv('DEFAULT_WIDTH', 80))
 
 def createChatCompletion(text_input):
     """
@@ -106,6 +106,7 @@ def generateTextToSpeech(text, language='en', filename='audio.mp3'):
     tts_obj = gTTS(text=text, lang=language, slow=False)
     tts_obj.save(tmp_filepath)
     speed_up_audio(input_file=tmp_filepath, output_file=filepath, speed=1.5)
+    os.remove(tmp_filepath)  # Clean up temporary file
     return filepath
 
 def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_file='output_folder/audio.mp3', output_filepath='output_folder/finished_video.mp4'):
@@ -125,7 +126,7 @@ def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_fil
     input_audio = ffmpeg.input(audio_file)
     (
         ffmpeg
-        .output(input_video, input_audio, output_filepath, vcodec='copy', acodec='copy', shortest=None)
+        .output(input_video['v'], input_audio['a'], output_filepath, format='mp4', vcodec='copy', acodec='copy', shortest=None)
         .run(overwrite_output=True)
     )
     return output_filepath
@@ -212,7 +213,7 @@ if st.button("Brainrotize"):
             width = DEFAULT_WIDTH
             side = max((100 - width) / 2, 0.01)
             _, container, _ = st.columns([side, width, side])
-            container.video(data=brainrot_video_filepath, format='video/mp4', autoplay=True)
+            container.video(data=brainrot_video_filepath, format='video/mp4', autoplay=False)
             st.write(brainrot)
         except Exception as e:
             st.error(f"An error occurred: {e}")
