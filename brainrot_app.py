@@ -206,7 +206,7 @@ if st.button("Brainrotize"):
                     st.success(icon='🔥', body=f'W brainrot video generation! (Time taken: {elapsed_time:.2f} secs)')
 
                 total_elapsed_time = end_time - initial_start_time
-                status.update(label="W brainrot 🗿 ({total_elapsed_time:.2f} secs)", state="complete", expanded=False)
+                status.update(label=f"W brainrot 🗿 ({total_elapsed_time:.2f} secs)", state="complete", expanded=False)
 
             st.subheader("Brainrot")
             width = DEFAULT_WIDTH
