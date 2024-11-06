@@ -5,3 +5,4 @@
 *.pdf
 scrapbook.ipynb
 .DS_Store
+output_folder/*
