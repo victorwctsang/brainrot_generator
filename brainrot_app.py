@@ -131,6 +131,83 @@ def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_fil
     )
     return output_filepath
 
+import whisper
+import srt
+from datetime import timedelta
+
+def load_and_transcribe(input_audio_filepath):
+    """
+    Load the Whisper model and transcribe the input audio file.
+    """
+    model = whisper.load_model("small")
+    whisper_result = model.transcribe(input_audio_filepath, task="transcribe", fp16=False)
+    return whisper_result
+
+def calculate_target_word_counts(whisper_result, original_text):
+    """
+    Calculate the target word count for each segment based on the segment durations.
+    """
+    original_text_words = original_text.split()
+    total_words = len(original_text_words)
+
+    # Total duration of all segments
+    total_duration = sum(segment["end"] - segment["start"] for segment in whisper_result["segments"])
+
+    # Calculate target word count for each segment
+    target_word_counts = [
+        round((segment["end"] - segment["start"]) / total_duration * total_words)
+        for segment in whisper_result["segments"]
+    ]
+
+    return target_word_counts
+
+def split_text_into_chunks(original_text, target_word_counts):
+    """
+    Split original text into chunks based on the target word counts.
+    """
+    original_text_words = original_text.split()
+    original_text_chunks = []
+    word_index = 0
+
+    for word_count in target_word_counts:
+        chunk = " ".join(original_text_words[word_index:word_index + word_count])
+        original_text_chunks.append(chunk)
+        word_index += word_count
+
+    return original_text_chunks
+
+def create_subtitles(whisper_result, original_text_chunks):
+    """
+    Create subtitle entries from the Whisper segments and text chunks.
+    """
+    subs = []
+    for i, chunk in enumerate(original_text_chunks):
+        if i < len(whisper_result["segments"]):  # Ensure we don't go out of bounds
+            segment = whisper_result["segments"][i]
+            start = timedelta(seconds=segment["start"])
+            end = timedelta(seconds=segment["end"])
+            subs.append(srt.Subtitle(index=i + 1, start=start, end=end, content=chunk.strip()))
+
+    return subs
+
+def save_srt_file(subtitles, output_srt_filepath):
+    """
+    Generate the SRT content from subtitles and save it to a file.
+    """
+    srt_content = srt.compose(subtitles)
+    with open(output_srt_filepath, "w") as f:
+        f.write(srt_content)
+    print(f"SRT file created at {output_srt_filepath}")
+
+# Main function for use in Streamlit app
+def generate_srt(input_audio_filepath, original_text, output_srt_filepath):
+    whisper_result = load_and_transcribe(input_audio_filepath)
+    target_word_counts = calculate_target_word_counts(whisper_result, original_text)
+    original_text_chunks = split_text_into_chunks(original_text, target_word_counts)
+    subtitles = create_subtitles(whisper_result, original_text_chunks)
+    save_srt_file(subtitles, output_srt_filepath)
+    return output_srt_filepath
+
 ########################################################################################################################
 # Interface
 ########################################################################################################################
@@ -190,12 +267,10 @@ if st.button("Brainrotize"):
                 if brainrot_tts_filepath:
                     st.success(icon='🔥', body=f'W brainrot audio generation! (Time taken: {elapsed_time:.2f} secs)')
 
-
                 status_message = "I went to video generation island and everyone knew you..."
                 st.info(icon='💬', body=status_message)
                 status.update(label=status_message, state="running", expanded=True)
-
-
+                # Start timing
                 start_time = time.time()
                 # Call the function
                 brainrot_video_filepath = combineVideoAndAudio(audio_file=brainrot_tts_filepath)
@@ -206,6 +281,17 @@ if st.button("Brainrotize"):
                 if brainrot_video_filepath:
                     st.success(icon='🔥', body=f'W brainrot video generation! (Time taken: {elapsed_time:.2f} secs)')
 
+                status_message = "Generating captions..."
+                st.info(icon='💬', body=status_message)
+                status.update(label=status_message, state="running", expanded=True)
+                # Start timing
+                start_time = time.time()
+                # Call the functions
+                brainrot_srt_filepath = generate_srt(brainrot_tts_filepath, brainrot, 'output_folder/subtitles.srt')
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+
+                # Print total elapsed time
                 total_elapsed_time = end_time - initial_start_time
                 status.update(label=f"W brainrot 🗿 ({total_elapsed_time:.2f} secs)", state="complete", expanded=False)
 
@@ -213,8 +299,7 @@ if st.button("Brainrotize"):
             width = DEFAULT_WIDTH
             side = max((100 - width) / 2, 0.01)
             _, container, _ = st.columns([side, width, side])
-            container.video(data=brainrot_video_filepath, format='video/mp4', autoplay=False)
-            st.write(brainrot)
+            container.video(data=brainrot_video_filepath, format='video/mp4', subtitles=brainrot_srt_filepath, autoplay=False)
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
