@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -108,12 +109,23 @@ def generateTextToSpeech(text, language='en', filename='audio.mp3'):
     return filepath
 
 def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_file='output_folder/audio.mp3', output_filepath='output_folder/finished_video.mp4'):
+    """
+    Combines video and audio files into a single output file without re-encoding the video.
+
+    Args:
+        video_file (str): Path to the video file.
+        audio_file (str): Path to the audio file.
+        output_filepath (str): Path to the output video file.
+
+    Returns:
+        str: Path to the combined output video.
+    """
+
     input_video = ffmpeg.input(video_file)
     input_audio = ffmpeg.input(audio_file)
     (
         ffmpeg
-        .concat(input_video, input_audio, v=1, a=1)
-        .output(output_filepath, shortest=None)
+        .output(input_video, input_audio, output_filepath, vcodec='copy', acodec='copy', shortest=None)
         .run(overwrite_output=True)
     )
     return output_filepath
@@ -150,19 +162,51 @@ if st.button("Brainrotize"):
                 status_message = "Asking the rizzler to turn your words into W brainrot..."
                 st.info(icon='💬', body=status_message)
                 status.update(label=status_message, state="running", expanded=True)
+                # Start timing
+                start_time = time.time()
+                initial_start_time = start_time
+                # Call the function
                 brainrot = createChatCompletion(user_input)
+                # Calculate elapsed time
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                # Print elapsed time if successful
+                if brainrot:
+                    st.success(icon='🔥', body=f'W brainrot text generation! (Time taken: {elapsed_time:.2f} secs)')
 
                 status_message = "Me when I go to the audio generation competition and my opponent is you..."
                 st.info(icon='💬', body=status_message)
                 status.update(label=status_message, state="running", expanded=True)
+
+                # Start timing
+                start_time = time.time()
+                # Call the function
                 brainrot_tts_filepath = generateTextToSpeech(brainrot)
+                # Calculate elapsed time
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                # Print elapsed time if successful
+                if brainrot_tts_filepath:
+                    st.success(icon='🔥', body=f'W brainrot audio generation! (Time taken: {elapsed_time:.2f} secs)')
+
 
                 status_message = "I went to video generation island and everyone knew you..."
                 st.info(icon='💬', body=status_message)
                 status.update(label=status_message, state="running", expanded=True)
-                brainrot_video_filepath = combineVideoAndAudio(audio_file=brainrot_tts_filepath)
 
-                status.update(label="W brainrot 🗿", state="complete", expanded=False)
+
+                start_time = time.time()
+                # Call the function
+                brainrot_video_filepath = combineVideoAndAudio(audio_file=brainrot_tts_filepath)
+                # Calculate elapsed time
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                # Print elapsed time if successful
+                if brainrot_video_filepath:
+                    st.success(icon='🔥', body=f'W brainrot video generation! (Time taken: {elapsed_time:.2f} secs)')
+
+                total_elapsed_time = end_time - initial_start_time
+                status.update(label="W brainrot 🗿 ({total_elapsed_time:.2f} secs)", state="complete", expanded=False)
 
             st.subheader("Brainrot")
             width = DEFAULT_WIDTH
