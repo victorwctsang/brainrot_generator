@@ -250,7 +250,7 @@ if st.button("Brainrotize"):
                 elapsed_time = end_time - start_time
                 # Print elapsed time if successful
                 if brainrot:
-                    st.success(icon='🔥', body=f'W brainrot text generation! (Time taken: {elapsed_time:.2f} secs)')
+                    st.success(icon='🔥', body=f'W brainrot text generated! (Time taken: {elapsed_time:.2f} secs)')
 
                 status_message = "Me when I go to the audio generation competition and my opponent is you..."
                 st.info(icon='💬', body=status_message)
@@ -265,7 +265,7 @@ if st.button("Brainrotize"):
                 elapsed_time = end_time - start_time
                 # Print elapsed time if successful
                 if brainrot_tts_filepath:
-                    st.success(icon='🔥', body=f'W brainrot audio generation! (Time taken: {elapsed_time:.2f} secs)')
+                    st.success(icon='🔥', body=f'W brainrot audio generated! (Time taken: {elapsed_time:.2f} secs)')
 
                 status_message = "I went to video generation island and everyone knew you..."
                 st.info(icon='💬', body=status_message)
@@ -279,7 +279,7 @@ if st.button("Brainrotize"):
                 elapsed_time = end_time - start_time
                 # Print elapsed time if successful
                 if brainrot_video_filepath:
-                    st.success(icon='🔥', body=f'W brainrot video generation! (Time taken: {elapsed_time:.2f} secs)')
+                    st.success(icon='🔥', body=f'W brainrot video generated! (Time taken: {elapsed_time:.2f} secs)')
 
                 status_message = "Generating captions..."
                 st.info(icon='💬', body=status_message)
@@ -290,6 +290,9 @@ if st.button("Brainrotize"):
                 brainrot_srt_filepath = generate_srt(brainrot_tts_filepath, brainrot, 'output_folder/subtitles.srt')
                 end_time = time.time()
                 elapsed_time = end_time - start_time
+                # Print elapsed time if successful
+                if brainrot_video_filepath:
+                    st.success(icon='🔥', body=f'W brainrot captions generated! (Time taken: {elapsed_time:.2f} secs)')
 
                 # Print total elapsed time
                 total_elapsed_time = end_time - initial_start_time
