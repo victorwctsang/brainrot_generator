@@ -2,8 +2,7 @@ from datetime import timedelta
 import srt
 import whisper
 
-
-def loadAndTranscribe(input_audio_filepath):
+def loadAndTranscribe(input_audio_filepath, model_version='base'):
     """Loads an audio file and transcribes it using the Whisper model.
 
     Args:
@@ -14,7 +13,9 @@ def loadAndTranscribe(input_audio_filepath):
     """
     model = whisper.load_model("small")
     whisper_result = model.transcribe(
-        input_audio_filepath, task="transcribe", fp16=False)
+        input_audio_filepath,
+        task="transcribe",
+        fp16=False)
     return whisper_result
 
 
@@ -108,7 +109,7 @@ def saveSrtFile(subtitles, output_srt_filepath):
     print(f"SRT file created at {output_srt_filepath}")
 
 
-def generateSubtitles(input_audio_filepath, original_text, output_srt_filepath):
+def generateSubtitles(input_audio_filepath, original_text, output_srt_filepath, model_version='base'):
     """Generates an SRT file from an audio file and its corresponding text.
 
     This function orchestrates the entire process of loading the audio,
@@ -123,7 +124,7 @@ def generateSubtitles(input_audio_filepath, original_text, output_srt_filepath):
     Returns:
         The path to the output SRT file.
     """
-    whisper_result = loadAndTranscribe(input_audio_filepath)
+    whisper_result = loadAndTranscribe(input_audio_filepath, model_version=model_version)
     target_word_counts = calculateTargetWordCounts(
         whisper_result, original_text)
     original_text_chunks = splitTextIntoChunks(
