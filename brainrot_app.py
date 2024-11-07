@@ -199,7 +199,6 @@ def save_srt_file(subtitles, output_srt_filepath):
         f.write(srt_content)
     print(f"SRT file created at {output_srt_filepath}")
 
-# Main function for use in Streamlit app
 def generate_srt(input_audio_filepath, original_text, output_srt_filepath):
     whisper_result = load_and_transcribe(input_audio_filepath)
     target_word_counts = calculate_target_word_counts(whisper_result, original_text)
@@ -207,6 +206,34 @@ def generate_srt(input_audio_filepath, original_text, output_srt_filepath):
     subtitles = create_subtitles(whisper_result, original_text_chunks)
     save_srt_file(subtitles, output_srt_filepath)
     return output_srt_filepath
+
+def process_step(status, message, function, *args, **kwargs):
+  """
+  Processes a single step of the pipeline.
+
+  Args:
+    status: The streamlit status object.
+    message: The message to display in the status update.
+    function: The function to execute.
+    *args: Positional arguments to pass to the function.
+    **kwargs: Keyword arguments to pass to the function.
+
+  Returns:  
+
+    The result of the  
+ function call.
+  """
+  status_message = message
+  st.info(icon='💬', body=status_message)
+  status.update(label=status_message, state="running", expanded=True)
+  start_time = time.time()
+  result = function(*args, **kwargs)
+  end_time = time.time()
+  elapsed_time = end_time - start_time
+  if result:
+    st.success(icon='🔥', body=f'{message} (Time taken: {elapsed_time:.2f} secs)')
+  return result
+
 
 ########################################################################################################################
 # Interface
@@ -237,65 +264,40 @@ if st.button("Brainrotize"):
     if user_input:
         try:
             with st.status('Going to Ohio...') as status:
-                status_message = "Asking the rizzler to turn your words into W brainrot..."
-                st.info(icon='💬', body=status_message)
-                status.update(label=status_message, state="running", expanded=True)
-                # Start timing
-                start_time = time.time()
-                initial_start_time = start_time
-                # Call the function
-                brainrot = createChatCompletion(user_input)
-                # Calculate elapsed time
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                # Print elapsed time if successful
-                if brainrot:
-                    st.success(icon='🔥', body=f'W brainrot text generated! (Time taken: {elapsed_time:.2f} secs)')
+                initial_start_time = time.time()
 
-                status_message = "Me when I go to the audio generation competition and my opponent is you..."
-                st.info(icon='💬', body=status_message)
-                status.update(label=status_message, state="running", expanded=True)
+                brainrot = process_step(
+                    status,
+                    "Asking the rizzler to turn your words into W brainrot...",
+                    createChatCompletion,
+                    user_input,
+                )
 
-                # Start timing
-                start_time = time.time()
-                # Call the function
-                brainrot_tts_filepath = generateTextToSpeech(brainrot)
-                # Calculate elapsed time
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                # Print elapsed time if successful
-                if brainrot_tts_filepath:
-                    st.success(icon='🔥', body=f'W brainrot audio generated! (Time taken: {elapsed_time:.2f} secs)')
+                brainrot_tts_filepath = process_step(
+                    status,
+                    "Me when I go to the audio generation competition and my opponent is you...",
+                    generateTextToSpeech,
+                    brainrot,
+                )
 
-                status_message = "I went to video generation island and everyone knew you..."
-                st.info(icon='💬', body=status_message)
-                status.update(label=status_message, state="running", expanded=True)
-                # Start timing
-                start_time = time.time()
-                # Call the function
-                brainrot_video_filepath = combineVideoAndAudio(audio_file=brainrot_tts_filepath)
-                # Calculate elapsed time
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                # Print elapsed time if successful
-                if brainrot_video_filepath:
-                    st.success(icon='🔥', body=f'W brainrot video generated! (Time taken: {elapsed_time:.2f} secs)')
+                brainrot_video_filepath = process_step(
+                    status,
+                    "I went to video generation island and everyone knew you...",
+                    combineVideoAndAudio,
+                    audio_file=brainrot_tts_filepath,
+                )
 
-                status_message = "Generating captions..."
-                st.info(icon='💬', body=status_message)
-                status.update(label=status_message, state="running", expanded=True)
-                # Start timing
-                start_time = time.time()
-                # Call the functions
-                brainrot_srt_filepath = generate_srt(brainrot_tts_filepath, brainrot, 'output_folder/subtitles.srt')
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                # Print elapsed time if successful
-                if brainrot_video_filepath:
-                    st.success(icon='🔥', body=f'W brainrot captions generated! (Time taken: {elapsed_time:.2f} secs)')
+                brainrot_srt_filepath = process_step(
+                    status,
+                    "Generating captions...",
+                    generate_srt,
+                    brainrot_tts_filepath,
+                    brainrot,
+                    'output_folder/subtitles.srt',
+                )
 
                 # Print total elapsed time
-                total_elapsed_time = end_time - initial_start_time
+                total_elapsed_time = time.time() - initial_start_time
                 status.update(label=f"W brainrot 🗿 ({total_elapsed_time:.2f} secs)", state="complete", expanded=False)
 
             st.subheader("Brainrot")
