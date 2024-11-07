@@ -18,7 +18,8 @@ This app takes content as input and sends it to OpenAI's API, generating a summa
 - [ ] **Faster subtitles**: Speed up subtitles using a faster whisper implementation: https://huggingface.co/openai/whisper-large-v2#long-form-transcription
 - [ ] **Fine Tuned Model**: A specific model trained on brainrot responses.
 - [ ] **Varied background clips**: Currently this uses the same subway surfers video. There needs to be more variety.
-- [ ] **Embedded**: Currently we are displaying the captions using a `.srt` file and streamlit. To be truly brainrot, the captions should be part of the video,
+- [ ] **Captions as video layer**: Currently we are displaying the captions using a `.srt` file and streamlit. To be truly brainrot, the captions should be part of the video,
+- [ ] **Randomly insert metal pipe sounds**: Randomly insert metal pipe sounds. Why not.
 ideally as text in a reddit/twitter bubble.
 
 ## Getting Started
