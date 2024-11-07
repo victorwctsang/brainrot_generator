@@ -87,7 +87,6 @@ def splitTextIntoChunks(text, chunk_size=40):
 
     return chunks
 
-
 def speed_up_audio(input_file, output_file, speed=1.75):
     """
     Speeds up an audio file by a specified factor using ffmpeg.
@@ -95,10 +94,16 @@ def speed_up_audio(input_file, output_file, speed=1.75):
     Args:
         input_file (str): Path to the input audio file.
         output_file (str): Path to save the sped-up output audio file.
-        speed (float): The factor by which to speed up the audio (default is 1.5x).
+        speed (float): The factor by which to speed up the audio (default is 1.75x).
+
+    Raises:
+        ValueError: If the speed value is not within the valid range for the 'atempo' filter (0.5 to 2.0).
     """
+    # Check if the speed value is valid for the 'atempo' filter
+    if not 0.5 <= speed <= 2.0:
+        raise ValueError("Invalid speed value. 'atempo' filter supports a speed range of 0.5 to 2.0")
+
     # Adjust the atempo filter to the desired speed
-    # Note: 'atempo' supports a range of 0.5 to 2.0, so for 1.5x we can apply it directly
     (
         ffmpeg
         .input(input_file)
@@ -107,8 +112,20 @@ def speed_up_audio(input_file, output_file, speed=1.75):
         .run(overwrite_output=True)
     )
 
-
 def generateTextToSpeech(text, language='en', filename='audio.mp3'):
+    """Generates a text-to-speech audio file.
+
+    This function uses gTTS to convert the given text into speech in the specified language.
+    It then speeds up the generated audio by a factor of 1.5 and saves it to the specified filename.
+
+    Args:
+        text: The text to convert to speech.
+        language: The language code (e.g., 'en' for English, 'es' for Spanish). Defaults to 'en'.
+        filename: The name of the output audio file. Defaults to 'audio.mp3'.
+
+    Returns:
+        The filepath of the generated audio file.
+    """
     tmp_filepath = f"output_folder/tmp-{filename}"
     filepath = f"output_folder/{filename}"
     tts_obj = gTTS(text=text, lang=language, slow=False)
@@ -142,8 +159,13 @@ def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_fil
 
 
 def load_and_transcribe(input_audio_filepath):
-    """
-    Load the Whisper model and transcribe the input audio file.
+    """Loads an audio file and transcribes it using the Whisper model.
+
+    Args:
+        input_audio_filepath: Path to the input audio file.
+
+    Returns:
+        A dictionary containing the transcription results from Whisper.
     """
     model = whisper.load_model("small")
     whisper_result = model.transcribe(
@@ -152,8 +174,18 @@ def load_and_transcribe(input_audio_filepath):
 
 
 def calculate_target_word_counts(whisper_result, original_text):
-    """
-    Calculate the target word count for each segment based on the segment durations.
+    """Calculates the target word count for each segment in the transcription.
+
+    The target word count is determined based on the duration of each segment
+    relative to the total duration of the audio and the total number of words
+    in the original text.
+
+    Args:
+        whisper_result: A dictionary containing the transcription results from Whisper.
+        original_text: The original text corresponding to the audio.
+
+    Returns:
+        A list of target word counts for each segment.
     """
     original_text_words = original_text.split()
     total_words = len(original_text_words)
@@ -173,8 +205,14 @@ def calculate_target_word_counts(whisper_result, original_text):
 
 
 def split_text_into_chunks(original_text, target_word_counts):
-    """
-    Split original text into chunks based on the target word counts.
+    """Splits the original text into chunks based on the target word counts.
+
+    Args:
+        original_text: The original text to be split.
+        target_word_counts: A list of target word counts for each chunk.
+
+    Returns:
+        A list of text chunks.
     """
     original_text_words = original_text.split()
     original_text_chunks = []
@@ -190,8 +228,14 @@ def split_text_into_chunks(original_text, target_word_counts):
 
 
 def create_subtitles(whisper_result, original_text_chunks):
-    """
-    Create subtitle entries from the Whisper segments and text chunks.
+    """Creates subtitle entries from the Whisper transcription and text chunks.
+
+    Args:
+        whisper_result: A dictionary containing the transcription results from Whisper.
+        original_text_chunks: A list of text chunks.
+
+    Returns:
+        A list of subtitle objects.
     """
     subs = []
     for i, chunk in enumerate(original_text_chunks):
@@ -207,8 +251,11 @@ def create_subtitles(whisper_result, original_text_chunks):
 
 
 def save_srt_file(subtitles, output_srt_filepath):
-    """
-    Generate the SRT content from subtitles and save it to a file.
+    """Generates SRT content from subtitles and saves it to a file.
+
+    Args:
+        subtitles: A list of subtitle objects.
+        output_srt_filepath: Path to the output SRT file.
     """
     srt_content = srt.compose(subtitles)
     with open(output_srt_filepath, "w") as f:
@@ -217,8 +264,19 @@ def save_srt_file(subtitles, output_srt_filepath):
 
 
 def generate_srt(input_audio_filepath, original_text, output_srt_filepath):
-    """
-    Wrapper function for generating SRT file
+    """Generates an SRT file from an audio file and its corresponding text.
+
+    This function orchestrates the entire process of loading the audio,
+    transcribing it, splitting the text into chunks, creating subtitles,
+    and saving the SRT file.
+
+    Args:
+        input_audio_filepath: Path to the input audio file.
+        original_text: The original text corresponding to the audio.
+        output_srt_filepath: Path to the output SRT file.
+
+    Returns:
+        The path to the output SRT file.
     """
     whisper_result = load_and_transcribe(input_audio_filepath)
     target_word_counts = calculate_target_word_counts(
@@ -231,20 +289,22 @@ def generate_srt(input_audio_filepath, original_text, output_srt_filepath):
 
 
 def process_step(status, message, function, *args, **kwargs):
-    """
-    Processes a single step of the pipeline.
+    """Processes a single step of a pipeline, providing status updates.
+
+    This function executes a given function with the provided arguments and
+    displays status updates in a Streamlit application. It also measures
+    and displays the execution time of the function.
 
     Args:
-      status: The streamlit status object.
-      message: The message to display in the status update.
-      function: The function to execute.
-      *args: Positional arguments to pass to the function.
-      **kwargs: Keyword arguments to pass to the function.
+        status: The Streamlit status object.
+        message: The message to display in the status update.
+        function: The function to execute.
+        *args: Positional arguments to pass to the function.
+        **kwargs: Keyword arguments to pass to the function.
 
-    Returns:  
-
-      The result of the  
-   function call.
+    Returns:
+        The result of the  
+    function call.
     """
     status_message = message
     st.info(icon='💬', body=status_message)
