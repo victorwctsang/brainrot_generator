@@ -1,22 +1,26 @@
-import time
-import streamlit as st
-from openai import OpenAI
+from datetime import timedelta
 from dotenv import load_dotenv
-import extra_streamlit_components as stx
-import os
 from gtts import gTTS
+from openai import OpenAI
 from PyPDF2 import PdfReader
+import extra_streamlit_components as stx
 import ffmpeg
+import os
+import srt
+import streamlit as st
+import time
+import whisper
 
 load_dotenv(override=True)
 
-########################################################################################################################
+################################################################################
 # Functions
-########################################################################################################################
+################################################################################
 
 # System prompt for brainrot explainer
 SYSTEM_PROMPT = os.getenv('SYSTEM_PROMPT', '')
 DEFAULT_WIDTH = int(os.getenv('DEFAULT_WIDTH', 80))
+
 
 def createChatCompletion(text_input):
     """
@@ -30,12 +34,13 @@ def createChatCompletion(text_input):
     """
     client = OpenAI()
     completion = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": text_input
-    }])
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": text_input
+             }])
     return completion.choices[0].message.content
+
 
 def getTextFromPDF(file):
     """
@@ -50,6 +55,7 @@ def getTextFromPDF(file):
     reader = PdfReader(file)
     pdf_text = ' '.join([page.extract_text() for page in reader.pages])
     return pdf_text
+
 
 def splitTextIntoChunks(text, chunk_size=40):
     """
@@ -81,6 +87,7 @@ def splitTextIntoChunks(text, chunk_size=40):
 
     return chunks
 
+
 def speed_up_audio(input_file, output_file, speed=1.75):
     """
     Speeds up an audio file by a specified factor using ffmpeg.
@@ -100,6 +107,7 @@ def speed_up_audio(input_file, output_file, speed=1.75):
         .run(overwrite_output=True)
     )
 
+
 def generateTextToSpeech(text, language='en', filename='audio.mp3'):
     tmp_filepath = f"output_folder/tmp-{filename}"
     filepath = f"output_folder/{filename}"
@@ -108,6 +116,7 @@ def generateTextToSpeech(text, language='en', filename='audio.mp3'):
     speed_up_audio(input_file=tmp_filepath, output_file=filepath, speed=1.5)
     os.remove(tmp_filepath)  # Clean up temporary file
     return filepath
+
 
 def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_file='output_folder/audio.mp3', output_filepath='output_folder/finished_video.mp4'):
     """
@@ -131,17 +140,16 @@ def combineVideoAndAudio(video_file='input_folder/subway_surfers.mp4', audio_fil
     )
     return output_filepath
 
-import whisper
-import srt
-from datetime import timedelta
 
 def load_and_transcribe(input_audio_filepath):
     """
     Load the Whisper model and transcribe the input audio file.
     """
     model = whisper.load_model("small")
-    whisper_result = model.transcribe(input_audio_filepath, task="transcribe", fp16=False)
+    whisper_result = model.transcribe(
+        input_audio_filepath, task="transcribe", fp16=False)
     return whisper_result
+
 
 def calculate_target_word_counts(whisper_result, original_text):
     """
@@ -151,15 +159,18 @@ def calculate_target_word_counts(whisper_result, original_text):
     total_words = len(original_text_words)
 
     # Total duration of all segments
-    total_duration = sum(segment["end"] - segment["start"] for segment in whisper_result["segments"])
+    total_duration = sum(segment["end"] - segment["start"]
+                         for segment in whisper_result["segments"])
 
     # Calculate target word count for each segment
     target_word_counts = [
-        round((segment["end"] - segment["start"]) / total_duration * total_words)
+        round((segment["end"] - segment["start"]) /
+              total_duration * total_words)
         for segment in whisper_result["segments"]
     ]
 
     return target_word_counts
+
 
 def split_text_into_chunks(original_text, target_word_counts):
     """
@@ -170,11 +181,13 @@ def split_text_into_chunks(original_text, target_word_counts):
     word_index = 0
 
     for word_count in target_word_counts:
-        chunk = " ".join(original_text_words[word_index:word_index + word_count])
+        chunk = " ".join(
+            original_text_words[word_index:word_index + word_count])
         original_text_chunks.append(chunk)
         word_index += word_count
 
     return original_text_chunks
+
 
 def create_subtitles(whisper_result, original_text_chunks):
     """
@@ -182,13 +195,16 @@ def create_subtitles(whisper_result, original_text_chunks):
     """
     subs = []
     for i, chunk in enumerate(original_text_chunks):
-        if i < len(whisper_result["segments"]):  # Ensure we don't go out of bounds
+        # Ensure we don't go out of bounds
+        if i < len(whisper_result["segments"]):
             segment = whisper_result["segments"][i]
             start = timedelta(seconds=segment["start"])
             end = timedelta(seconds=segment["end"])
-            subs.append(srt.Subtitle(index=i + 1, start=start, end=end, content=chunk.strip()))
+            subs.append(srt.Subtitle(index=i + 1, start=start,
+                        end=end, content=chunk.strip()))
 
     return subs
+
 
 def save_srt_file(subtitles, output_srt_filepath):
     """
@@ -199,45 +215,53 @@ def save_srt_file(subtitles, output_srt_filepath):
         f.write(srt_content)
     print(f"SRT file created at {output_srt_filepath}")
 
+
 def generate_srt(input_audio_filepath, original_text, output_srt_filepath):
+    """
+    Wrapper function for generating SRT file
+    """
     whisper_result = load_and_transcribe(input_audio_filepath)
-    target_word_counts = calculate_target_word_counts(whisper_result, original_text)
-    original_text_chunks = split_text_into_chunks(original_text, target_word_counts)
+    target_word_counts = calculate_target_word_counts(
+        whisper_result, original_text)
+    original_text_chunks = split_text_into_chunks(
+        original_text, target_word_counts)
     subtitles = create_subtitles(whisper_result, original_text_chunks)
     save_srt_file(subtitles, output_srt_filepath)
     return output_srt_filepath
 
+
 def process_step(status, message, function, *args, **kwargs):
-  """
-  Processes a single step of the pipeline.
+    """
+    Processes a single step of the pipeline.
 
-  Args:
-    status: The streamlit status object.
-    message: The message to display in the status update.
-    function: The function to execute.
-    *args: Positional arguments to pass to the function.
-    **kwargs: Keyword arguments to pass to the function.
+    Args:
+      status: The streamlit status object.
+      message: The message to display in the status update.
+      function: The function to execute.
+      *args: Positional arguments to pass to the function.
+      **kwargs: Keyword arguments to pass to the function.
 
-  Returns:  
+    Returns:  
 
-    The result of the  
- function call.
-  """
-  status_message = message
-  st.info(icon='💬', body=status_message)
-  status.update(label=status_message, state="running", expanded=True)
-  start_time = time.time()
-  result = function(*args, **kwargs)
-  end_time = time.time()
-  elapsed_time = end_time - start_time
-  if result:
-    st.success(icon='🔥', body=f'{message} (Time taken: {elapsed_time:.2f} secs)')
-  return result
+      The result of the  
+   function call.
+    """
+    status_message = message
+    st.info(icon='💬', body=status_message)
+    status.update(label=status_message, state="running", expanded=True)
+    start_time = time.time()
+    result = function(*args, **kwargs)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    if result:
+        st.success(icon='🔥', body=f'{
+                   message} (Time taken: {elapsed_time:.2f} secs)')
+    return result
 
 
-########################################################################################################################
+################################################################################
 # Interface
-########################################################################################################################
+################################################################################
 
 # Streamlit app interface
 st.title("Brainrot Generator")
@@ -245,9 +269,11 @@ st.write("Enter any text, and get a simple summary that even a gen-z kid could u
 
 # Text input for user
 tab = stx.tab_bar(data=[
-    stx.TabBarItemData(id="text", title="Type Text", description="Brainrotize your input text."),
-    stx.TabBarItemData(id="pdf", title="Upload PDF", description="Brainrotize an entire PDF.")
-    ], default="text")
+    stx.TabBarItemData(id="text", title="Type Text",
+                       description="Brainrotize your input text."),
+    stx.TabBarItemData(id="pdf", title="Upload PDF",
+                       description="Brainrotize an entire PDF.")
+], default="text")
 
 user_input = None
 if tab == "text":
@@ -258,7 +284,7 @@ elif tab == "pdf":
         pdf_text = getTextFromPDF(uploaded_file)
         user_input = pdf_text
 else:
-  result = "Select an option first"
+    result = "Select an option first"
 
 if st.button("Brainrotize"):
     if user_input:
@@ -298,16 +324,16 @@ if st.button("Brainrotize"):
 
                 # Print total elapsed time
                 total_elapsed_time = time.time() - initial_start_time
-                status.update(label=f"W brainrot 🗿 ({total_elapsed_time:.2f} secs)", state="complete", expanded=False)
+                status.update(label=f"W brainrot 🗿 ({
+                              total_elapsed_time:.2f} secs)", state="complete", expanded=False)
 
             st.subheader("Brainrot")
             width = DEFAULT_WIDTH
             side = max((100 - width) / 2, 0.01)
             _, container, _ = st.columns([side, width, side])
-            container.video(data=brainrot_video_filepath, format='video/mp4', subtitles=brainrot_srt_filepath, autoplay=False)
+            container.video(data=brainrot_video_filepath, format='video/mp4',
+                            subtitles=brainrot_srt_filepath, autoplay=False)
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter some text to brainrotize.")
-
-
