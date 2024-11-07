@@ -2,7 +2,7 @@ from datetime import timedelta
 import srt
 import whisper
 
-def loadAndTranscribe(input_audio_filepath, model_version='base'):
+def loadAndTranscribe(input_audio_filepath):
     """Loads an audio file and transcribes it using the Whisper model.
 
     Args:
