@@ -8,18 +8,11 @@ from media import generateTextToSpeech, combineVideoAndAudio
 from captions import generateSubtitles
 from utils import processStep
 
-################################################################################
-# Functions
-################################################################################
+load_dotenv(override=True)
 
 # System prompt for brainrot explainer
 SYSTEM_PROMPT = os.getenv('SYSTEM_PROMPT', '')
 DEFAULT_WIDTH = int(os.getenv('DEFAULT_WIDTH', 80))
-load_dotenv(override=True)
-
-################################################################################
-# Interface
-################################################################################
 
 # Streamlit app interface
 st.title("Brainrot Generator")
