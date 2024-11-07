@@ -3,10 +3,10 @@ import extra_streamlit_components as stx
 import os
 import streamlit as st
 import time
-from core import createChatCompletion, getTextFromPDF
-from media import generateTextToSpeech, combineVideoAndAudio
-from captions import generateSubtitles
-from utils import processStep
+from src.core import createChatCompletion, getTextFromPDF
+from src.media import generateTextToSpeech, combineVideoAndAudio
+from src.captions import generateSubtitles
+from src.utils import processStep
 
 load_dotenv(override=True)
 
@@ -76,15 +76,22 @@ if st.button("Brainrotize"):
 
                 # Print total elapsed time
                 total_elapsed_time = time.time() - initial_start_time
-                status.update(label=f"W brainrot 🗿 ({
-                              total_elapsed_time:.2f} secs)", state="complete", expanded=False)
+                status.update(
+                    label=f"W brainrot 🗿 ({total_elapsed_time:.2f} secs)",
+                    state="complete",
+                    expanded=False
+                )
 
             st.subheader("Brainrot")
             width = DEFAULT_WIDTH
             side = max((100 - width) / 2, 0.01)
             _, container, _ = st.columns([side, width, side])
-            container.video(data=brainrot_video_filepath, format='video/mp4',
-                            subtitles=brainrot_srt_filepath, autoplay=False)
+            container.video(
+                data=brainrot_video_filepath,
+                format='video/mp4',
+                subtitles=brainrot_srt_filepath,
+                autoplay=False
+            )
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
